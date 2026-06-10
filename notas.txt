@@ -1,0 +1,51 @@
+PROJECT STRUCTURE — Base Riders (Defensa y Asalto de Base)
+=============================================================
+
+main.py
+-------
+Entry point of the program. Creates the Tkinter window and
+loads the first screen. This is the file you run to start the game.
+
+models.py
+---------
+All the classes of the project. This is where you define:
+- Player (username, password, wins as defender/attacker)
+- Tower (name, cost, hp, damage, range, special ability)
+- Unit (name, cost, hp, damage, speed, special ability)
+- Wall (cost, hp)
+- Base (central base hp, faction appearance)
+Satisfies the minimum 3 classes requirement.
+
+game_logic.py
+-------------
+All the game rules and mechanics, no UI here. Handles:
+- Round flow (defender builds → attacker attacks → combat)
+- Combat phase (towers vs units, ability triggers)
+- Economy (starting money, rewards per kill/damage)
+- Win conditions (3 rounds won = game winner)
+
+ui_screens.py
+-------------
+All the Tkinter screens/frames. One section per screen:
+- Login / Register screen
+- Faction selection screen
+- Defender build phase screen
+- Attacker placement screen
+- Combat view screen
+- Ranking/top players screen
+
+file_manager.py
+---------------
+Everything related to reading and writing files. Handles:
+- Loading and saving players.json
+- Updating wins after a match
+- Loading the ranking data
+
+constants.py
+------------
+All fixed values used across the project:
+- Window size
+- Grid size (recommended 10x10)
+- Starting money per round
+- Colors and fonts
+- Faction names and visual data
