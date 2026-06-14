@@ -1,9 +1,9 @@
 import tkinter as tk
+from game_loops import *
+from ui_screens import *
 
-root = tk.Tk()
-root.title("Base Raiders")
-
-
+#testing delete
+on_game_loop()
 
 
 
