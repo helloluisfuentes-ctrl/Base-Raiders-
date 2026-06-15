@@ -4,7 +4,7 @@ Clases:
 player
 
 Unit
-    Estructure      # estructuras: Torres, muros, base central
+    Estructure      # estructuras:  muros, base central
         Base
         Wall
     Troop           # tropas:
@@ -38,26 +38,23 @@ class Player:
       
 class Unit:
     def __init__(self, x0, y0, width, height, health):
-        self.widht = width
+        self.width = width
         self.height = height  
         self.x0 = x0
         self.y0 = y0
         self.x1 = x0 + width
         self.y1 = y0 + height
-        #self.hitbox = (self.x0, self.y0),(self.x1, self.y1)
-        
         self.health = health
         
+# ---------------------------------------------------------------------------
+
+class Structure(Unit):
+    def __init__(self, x0, y0, width, height, health):
+        super().__init__(x0, y0, width, height, health)
         
 # ---------------------------------------------------------------------------
 
-class Estructure (Unit):
-    def __init__(self, pos_x, pos_y, health):
-        super().__init__(pos_x, pos_y, health)
-        
-# ---------------------------------------------------------------------------
-
-class Troop (Unit):
+class Troop(Unit):
     def __init__(self, x0, y0, width, height, health):
         super().__init__(x0, y0, width, height, health)
         '''
@@ -69,53 +66,64 @@ class Troop (Unit):
         
 # ---------------------------------------------------------------------------
 
-class Tower (Unit):
-    def __init__(self, pos_x, pos_y, health):
-        super().__init__(pos_x, pos_y, health)\
-            
-# ---------------------------------------------------------------------------------------
+class Tower(Unit):
+    def __init__(self, x0, y0, width, height, health):
+        super().__init__(x0, y0, width, height, health)
+
 # ---------------------------------------------------------------------------------------
 
-class Base (Estructure):
-    def __init__(self):
-        super().__init__()
+class Base(Structure):
+    def __init__(self, x0, y0, width=96, height=96, health=500):
+        super().__init__(x0, y0, width, height, health)
         
-class Wall (Estructure):
-    def __init__(self):
-        super().__init__()
+        
+class Wall(Structure):
+    def __init__(self, x0, y0, width=32, height=32, health=200):
+        super().__init__(x0, y0, width, height, health)
         
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 
-class Pekka (Troop):
-    def __init__(self,  x0, y0, width, height, health):
-        super().__init__( x0, y0, width, height, health)
+class Pekka(Troop):
+    def __init__(self, x0, y0, width=32, height=64, health=100):
+        super().__init__(x0, y0, width, height, health)
+        self.image = "black"
 
-class Dragon (Troop):
-    def __init__(self):
-        super().__init__()
+class Dragon(Troop):
+    def __init__(self, x0, y0, width=48, height=48, health=80):
+        super().__init__(x0, y0, width, height, health)
+        self.image = "purple"
         
-class Knight (Troop):
-    def __init__(self):
-        super().__init__()
+class Knight(Troop):
+    def __init__(self, x0, y0, width=32, height=32, health=100):
+        super().__init__(x0, y0, width, height, health)
+        self.image = "gray"
         
-class Archer (Troop):
-    def __init__(self):
-        super().__init__()
+class Archer(Troop):
+    def __init__(self, x0, y0, width=24, height=32, health=60):
+        super().__init__(x0, y0, width, height, health)
+        self.image = "pink"
         
-class Giant (Troop):
-    def __init__(self):
-        super().__init__()
+class Giant(Troop):
+    def __init__(self, x0, y0, width=48, height=64, health=300):
+        super().__init__(x0, y0, width, height, health)
+        self.image = "orange"
         
-class Goblin (Troop):
-    def __init__(self):
-        super().__init__()
+class Goblin(Troop):
+    def __init__(self, x0, y0, width=20, height=24, health=40):
+        super().__init__(x0, y0, width, height, health)
+        self.image = "green"
         
+# ----------------------------------------------------------------------------
 
-
-        
-
+class Wizard_tower(Tower):
+    def __init__(self, x0, y0, width=48, height=48, health=250):
+        super().__init__(x0, y0, width, height, health)
     
-        
-
+class Crossbow_tower(Tower):
+    def __init__(self, x0, y0, width=32, height=48, health=200):
+        super().__init__(x0, y0, width, height, health)
     
+class Spiky_tower(Tower):
+    def __init__(self, x0, y0, width=32, height=48, health=150):
+        super().__init__(x0, y0, width, height, health)

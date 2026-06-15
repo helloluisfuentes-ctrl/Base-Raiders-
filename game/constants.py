@@ -9,4 +9,8 @@ CELL_SIZE = 32
 # ====================================================================================
 
 list_raiders = []
+list_walls = []
+list_towers = []
+central_base = None
 
+selected_element = None
