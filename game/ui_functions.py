@@ -1,6 +1,6 @@
 from ui_screens import *
 from classes import *
-from constants import *
+import constants
 from game_loops import *
 # =========================================================================================
 #   FUNCIONES PARA MANEJAR LA UI
@@ -11,16 +11,22 @@ def start_plan_defense():
     game_frame.pack()
     canvas_field.pack()
     canvas_menu_plan_defense.pack()
-    planning_loop()
+    constants.central_base = Base(x0=CELL_SIZE*2, y0=CELL_SIZE*7)
+    constants.running = "plan"
+    root.after(32, planning_loop)
     
     
 def start_plan_attack():
     canvas_menu_plan_defense.pack_forget()
+    constants.selected_element = None
     canvas_menu_plan_attack.pack()
     
 def start_game():
     canvas_menu_plan_attack.pack_forget()
     canvas_menu_on_game.pack()
+    constants.selected_element = None
+    constants.running = "game"
+    root.after(32, on_game_loop)
     
 
 # =========================================================================================
@@ -88,7 +94,6 @@ def place_element(event):
             if troop.x0 <= event.x <= troop.x1 and troop.y0 <= event.y <= troop.y1:
                 list_raiders.remove(troop)
         
-        
-            
-    
 canvas_field.bind("<Button-1>", place_element)
+
+
