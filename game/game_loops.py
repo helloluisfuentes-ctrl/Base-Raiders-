@@ -11,11 +11,11 @@ def planning_loop():
     
     canvas_field.delete("all")
     
-    draw_raiders()
+    draw_limit_line()
+    draw_base()
     draw_walls()
     draw_towers()
-    draw_base()
-    
+    draw_raiders()
     
     root.after(32, planning_loop)
     
@@ -24,15 +24,22 @@ def planning_loop():
 
 
 def on_game_loop():
+    
+    check_win()
+    
     if constants.running != "game":
         return
     
     canvas_field.delete("all")
     
-    draw_raiders()
+    
+    
+    draw_base()
     draw_walls()
     draw_towers()
-    draw_base()
+    draw_raiders()
+    draw_projectiles_raiders()
+    draw_projectiles_towers()
     
     activate_troops()
     activate_towers()

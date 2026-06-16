@@ -2,10 +2,36 @@ import constants
 from ui_screens import *
 from classes import *
 
+
 # ==========================================================================================
-# Funciones para dibujar personajes
+# Check_win
 # ==========================================================================================
+def check_win():
+    if len(list_raiders) < 1:
+        show_defense_win()
+    elif constants.central_base.actual_health <= 0:
+        show_raiders_win()
+        
+def show_raiders_win():
+    """Detiene el juego y muestra pantalla de victoria para los raiders."""
+    constants.running = "win"
+    game_frame.pack_forget()
+    win_raiders_frame.pack()
+
+def show_defense_win():
+    """Detiene el juego y muestra pantalla de victoria para la defensa."""
+    constants.running = "win"
+    game_frame.pack_forget()
+    win_defense_frame.pack()
+
+# ==========================================================================================
+# DIBUJO
+# ==========================================================================================
+def draw_limit_line():
+    canvas_field.create_line(18 * CELL_SIZE, 0, 18 * CELL_SIZE, 16 * CELL_SIZE, fill= "white", width= 4)
+
 def draw_hp(unit):
+    """Dibuja la barra de vida encima de la unidad. No se muestra si está al máximo."""
     if unit.actual_health == unit.max_health:
         return
         
@@ -13,153 +39,170 @@ def draw_hp(unit):
     y0 = unit.y0
     x1 = unit.x1
 
-    canvas_field.create_rectangle(x0 -1 , y0 - 14, x1 + 1, y0 - 9, fill= "black")
-    hp_width = (unit.width/unit.max_health)*unit.actual_health
-    canvas_field.create_rectangle(x0, y0 - 13, x0 + hp_width, y0 - 10, fill= "lightgreen")
+    # Fondo negro de la barra
+    canvas_field.create_rectangle(x0 - 1, y0 - 14, x1 + 1, y0 - 9, fill="black")
+    # Barra verde proporcional a la vida actual
+    hp_width = (unit.width / unit.max_health) * unit.actual_health
+    canvas_field.create_rectangle(x0, y0 - 13, x0 + hp_width, y0 - 10, fill="lightgreen")
 
-def draw_raiders(): #TODO add images
+
+def draw_raiders():
+    """Dibuja todos los raiders. Elimina los que tienen vida <= 0."""
     for raider in list_raiders:
-        
         if raider.actual_health <= 0:
             list_raiders.remove(raider)
             continue
-        
-        x0 = raider.x0
-        y0 = raider.y0
-        x1 = raider.x1
-        y1 = raider.y1
-        
-        color = raider.image
-        
-        canvas_field.create_rectangle(x0, y0, x1, y1, fill=color, outline="black", width=2)
-        
-        
+        canvas_field.create_rectangle(raider.x0, raider.y0, raider.x1, raider.y1,
+                                      fill=raider.image, outline="black", width=2)
         draw_hp(raider)
-        
-        
 
-def draw_towers(): #TODO add images
+
+def draw_towers():
+    """Dibuja todas las torres. Elimina las que tienen vida <= 0."""
     for tower in list_towers:
-        
         if tower.actual_health <= 0:
             list_towers.remove(tower)
             continue
-        
-        x0 = tower.x0
-        y0 = tower.y0
-        x1 = tower.x1
-        y1 = tower.y1
-        
-        color = tower.image
-        
-        canvas_field.create_rectangle(x0, y0, x1, y1, fill=color, outline="black", width=2)
-        
-        
+        canvas_field.create_rectangle(tower.x0, tower.y0, tower.x1, tower.y1,
+                                      fill=tower.image, outline="black", width=2)
         draw_hp(tower)
-                
+
+
 def draw_walls():
+    """Dibuja todas las paredes. Elimina las que tienen vida <= 0."""
     for wall in list_walls:
-        
         if wall.actual_health <= 0:
             list_walls.remove(wall)
             continue
-        
-        x0 = wall.x0
-        y0 = wall.y0
-        x1 = wall.x1
-        y1 = wall.y1 
-        
-        canvas_field.create_rectangle(x0, y0, x1, y1, fill="brown", outline="black", width=2)
+        canvas_field.create_rectangle(wall.x0, wall.y0, wall.x1, wall.y1,
+                                      fill="brown", outline="black", width=2)
         draw_hp(wall)
 
+
 def draw_base():
+    """Dibuja la base central. La elimina si tiene vida <= 0."""
     if constants.central_base.actual_health <= 0:
-        constants.central_base = None
-    
-    x0 = constants.central_base.x0
-    y0 = constants.central_base.y0
-    x1 = constants.central_base.x1
-    y1 = constants.central_base.y1 
-        
-    canvas_field.create_rectangle(x0, y0, x1, y1, fill="white", outline="black", width=2)
-    draw_hp(constants.central_base)    
-    
+        check_win()
+        return
+    canvas_field.create_rectangle(constants.central_base.x0, constants.central_base.y0,
+                                  constants.central_base.x1, constants.central_base.y1,
+                                  fill="white", outline="black", width=2)
+    draw_hp(constants.central_base)
+
+
+def draw_projectiles_raiders():
+    """Dibuja los proyectiles de los raiders (flechas, bolas de fuego)."""
+    for projectile in constants.list_projectiles_raiders:
+        canvas_field.create_rectangle(projectile.x0, projectile.y0, projectile.x1, projectile.y1,
+                                      fill=projectile.image, outline="")
+
+
+def draw_projectiles_towers():
+    """Dibuja los proyectiles de las torres (hechizos, ballestas)."""
+    for projectile in constants.list_projectiles_towers:
+        canvas_field.create_rectangle(projectile.x0, projectile.y0, projectile.x1, projectile.y1,
+                                      fill=projectile.image, outline="")
+
+
 # ==========================================================================================
-# Funciones con hitbox
+# DETECCIÓN DE RANGO
 # ==========================================================================================
-      
+
 def what_structure_is_in_range(element):
+    """
+    Verifica si hay alguna estructura dentro del rango del elemento.
+    Prioridad: paredes → torres → base central.
+    Retorna la primera estructura encontrada, o None.
+    """
     x0 = element.x0 - element.range
     y0 = element.y0 - element.range
     x1 = element.x1 + element.range
     y1 = element.y1 + element.range
-    
+
     for wall in list_walls[:]:
         if x0 <= wall.x1 and x1 >= wall.x0 and y0 <= wall.y1 and y1 >= wall.y0:
             return wall
-            
+
     for tower in list_towers[:]:
         if x0 <= tower.x1 and x1 >= tower.x0 and y0 <= tower.y1 and y1 >= tower.y0:
             return tower
 
     if constants.central_base:
-        if x0 <= constants.central_base.x1 and x1 >= constants.central_base.x0 and y0 <= constants.central_base.y1 and y1 >= constants.central_base.y0:
-            return constants.central_base
-        
+        base = constants.central_base
+        if x0 <= base.x1 and x1 >= base.x0 and y0 <= base.y1 and y1 >= base.y0:
+            return base
+
     return None
 
+
 def what_troop_is_in_range(element):
+    """
+    Verifica si hay algún raider dentro del rango del elemento.
+    Retorna el primero encontrado, o None.
+    """
     x0 = element.x0 - element.range
     y0 = element.y0 - element.range
     x1 = element.x1 + element.range
     y1 = element.y1 + element.range
-    
+
     for troop in list_raiders[:]:
         if x0 <= troop.x1 and x1 >= troop.x0 and y0 <= troop.y1 and y1 >= troop.y0:
             return troop
 
     return None
 
+
 # ==========================================================================================
-# Funciones con movimiento
+# MOVIMIENTO
 # ==========================================================================================
 
 def nearest_structure_target(troop):
+    """
+    Retorna la estructura más cercana al troop.
+    Si no hay torres, apunta a la base central.
+    """
     targets = list_towers if list_towers else ([constants.central_base] if constants.central_base else [])
-    
+
     if not targets:
         return None
-    
+
     def distance(unit):
-        center_troop_x = troop.x0 + troop.width / 2
-        center_troop_y = troop.y0 + troop.height / 2
-        center_target_x = unit.x0 + unit.width / 2
-        center_target_y = unit.y0 + unit.height / 2
-        return ((center_troop_x - center_target_x)**2 + (center_troop_y - center_target_y)**2) ** 0.5
-    
+        cx_troop  = troop.x0 + troop.width  / 2
+        cy_troop  = troop.y0 + troop.height / 2
+        cx_target = unit.x0  + unit.width   / 2
+        cy_target = unit.y0  + unit.height  / 2
+        return ((cx_troop - cx_target)**2 + (cy_troop - cy_target)**2) ** 0.5
+
     return min(targets, key=distance)
 
+
 def nearest_troop_target(tower):
+    """Retorna el raider más cercano a la torre. Retorna None si no hay raiders."""
     if not list_raiders:
         return None
-    
+
     def distance(troop):
-        center_tower_x = tower.x0 + tower.width / 2
-        center_tower_y = tower.y0 + tower.height / 2
-        center_troop_x = troop.x0 + troop.width / 2
-        center_troop_y = troop.y0 + troop.height / 2
-        return ((center_tower_x - center_troop_x)**2 + (center_tower_y - center_troop_y)**2) ** 0.5
-    
+        cx_tower = tower.x0 + tower.width  / 2
+        cy_tower = tower.y0 + tower.height / 2
+        cx_troop = troop.x0 + troop.width  / 2
+        cy_troop = troop.y0 + troop.height / 2
+        return ((cx_tower - cx_troop)**2 + (cy_tower - cy_troop)**2) ** 0.5
+
     return min(list_raiders, key=distance)
 
-def move_troop(troop, target):
-    center_troop_x = troop.x0 + troop.width / 2
-    center_troop_y = troop.y0 + troop.height / 2
-    center_target_x = target.x0 + target.width / 2
-    center_target_y = target.y0 + target.height / 2
 
-    dx = center_target_x - center_troop_x
-    dy = center_target_y - center_troop_y
+def move_troop(troop, target):
+    """
+    Mueve el troop un paso hacia el target.
+    El tamaño del paso depende de troop.speed.
+    """
+    cx_troop  = troop.x0  + troop.width   / 2
+    cy_troop  = troop.y0  + troop.height  / 2
+    cx_target = target.x0 + target.width  / 2
+    cy_target = target.y0 + target.height / 2
+
+    dx = cx_target - cx_troop
+    dy = cy_target - cy_troop
     distance = (dx**2 + dy**2) ** 0.5
 
     if distance == 0:
@@ -173,101 +216,131 @@ def move_troop(troop, target):
     troop.x1 += step_x
     troop.y1 += step_y
 
+
 def move_projectiles_raiders():
+    """Mueve cada proyectil de raider y verifica si golpeó una estructura."""
     for projectile in constants.list_projectiles_raiders[:]:
         target = nearest_structure_target(projectile)
         if target is None:
             constants.list_projectiles_raiders.remove(projectile)
             continue
         move_troop(projectile, target)
+        # verificar si el proyectil llegó al objetivo
+        structure_hit = what_structure_is_in_range(projectile)
+        if structure_hit:
+            structure_hit.actual_health -= projectile.attack
+            constants.list_projectiles_raiders.remove(projectile)
+
 
 def move_projectiles_towers():
+    """Mueve cada proyectil de torre y verifica si golpeó un raider."""
     for projectile in constants.list_projectiles_towers[:]:
         target = nearest_troop_target(projectile)
         if target is None:
             constants.list_projectiles_towers.remove(projectile)
             continue
         move_troop(projectile, target)
+        # verificar si el proyectil llegó al objetivo
+        troop_hit = what_troop_is_in_range(projectile)
+        if troop_hit:
+            troop_hit.actual_health -= projectile.attack
+            constants.list_projectiles_towers.remove(projectile)
 
 # ==========================================================================================
-# Funciones con ataque
+# ATAQUE
 # ==========================================================================================
 
 def attack_structure(troop, structure):
-    
-    if isinstance(troop, ArcherArrow) or isinstance(troop, DragonFireball):
-        structure.actual_health -= troop.attack
-        constants.list_projectiles_raiders.remove(troop)
-        return
-    
+    """
+    El troop ataca la estructura.
+    - Si está en cooldown: espera.
+    - Si es Archer o Dragon: dispara un proyectil.
+    - Si es melee: daña directamente.
+    """
+
+    # Cooldown activo: decrementar y esperar
     if troop.cooldown_timer > 0:
         troop.cooldown_timer -= 1
         return
-    
-    if isinstance(troop, Archer) or isinstance(troop, Dragon):
+
+    # Ataque ranged: dispara proyectil
+    if isinstance(troop, (Archer, Dragon)):
         shoot_structure(troop)
+    # Ataque melee: daño directo
     else:
         structure.actual_health -= troop.attack
-        
-    troop.cooldown_timer = troop.cooldown
-               
-def shoot_structure(troop):
-    if isinstance(troop, Archer):
-        arrow = ArcherArrow(troop.x0, troop.y0)
-        constants.list_projectiles_raiders.append(arrow) 
-    elif isinstance(troop, Dragon):
-        fireball = DragonFireball(troop.x0, troop.y0)
-        constants.list_projectiles_raiders.append(fireball)
 
-# ----------------------------------------------------------------------------------------
+    troop.cooldown_timer = troop.cooldown
+
+
+def shoot_structure(troop):
+    """Crea el proyectil correspondiente al troop y lo agrega a list_projectiles_raiders."""
+    if isinstance(troop, Archer):
+        constants.list_projectiles_raiders.append(ArcherArrow(troop.x0, troop.y0))
+    elif isinstance(troop, Dragon):
+        constants.list_projectiles_raiders.append(DragonFireball(troop.x0, troop.y0))
+
 
 def attack_troop(structure, troop):
-
-    if isinstance(structure, WizardSpell) or isinstance(structure, CrossbowBolt):
-        troop.actual_health -= structure.attack
-        constants.list_projectiles_towers.remove(structure)
-        return
-
+    """
+    La estructura ataca al troop.
+    - Si está en cooldown: espera.
+    - Si es Wizard_tower o Crossbow_tower: dispara un proyectil.
+    - Si es Spiky_tower: daño melee directo.
+    """
+    # Cooldown activo: decrementar y esperar
     if structure.cooldown_timer > 0:
         structure.cooldown_timer -= 1
         return
 
-    if isinstance(structure, Wizard_tower) or isinstance(structure, Crossbow_tower):
+    # Ataque ranged: dispara proyectil
+    if isinstance(structure, (Wizard_tower, Crossbow_tower)):
         shoot_troop(structure)
+    # Ataque melee: daño directo (Spiky_tower)
     else:
-        troop.actual_health -= structure.attack  # spiky tower
+        troop.actual_health -= structure.attack
 
     structure.cooldown_timer = structure.cooldown
 
+
 def shoot_troop(structure):
+    """Crea el proyectil correspondiente a la torre y lo agrega a list_projectiles_towers."""
     if isinstance(structure, Wizard_tower):
-        spell = WizardSpell(structure.x0, structure.y0)
-        constants.list_projectiles_towers.append(spell)
+        constants.list_projectiles_towers.append(WizardSpell(structure.x0, structure.y0))
     elif isinstance(structure, Crossbow_tower):
-        bolt = CrossbowBolt(structure.x0, structure.y0)
-        constants.list_projectiles_towers.append(bolt)
+        constants.list_projectiles_towers.append(CrossbowBolt(structure.x0, structure.y0))
+
 
 # ==========================================================================================
-# Funciones con manejo de acciones
+# LOOP DE ACCIONES
 # ==========================================================================================
 
 def activate_troops():
+    """Itera sobre todos los raiders y ejecuta su acción (atacar o moverse)."""
     for troop in list_raiders:
         move_or_attack(troop)
 
+
 def activate_towers():
+    """Itera sobre todas las torres y ataca al raider más cercano si está en rango."""
     for structure in list_towers:
         troop_in_range = what_troop_is_in_range(structure)
         if troop_in_range:
             attack_troop(structure, troop_in_range)
 
+
 def move_or_attack(troop):
+    """
+    Decide si el troop ataca o se mueve.
+    Si hay una estructura en rango: ataca.
+    Si no: se mueve hacia la estructura más cercana.
+    """
     structure_in_range = what_structure_is_in_range(troop)
-    
+
     if structure_in_range:
         attack_structure(troop, structure_in_range)
         return
-    
+
     target = nearest_structure_target(troop)
     if target:
         move_troop(troop, target)
