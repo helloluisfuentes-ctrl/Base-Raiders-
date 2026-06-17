@@ -1,3 +1,4 @@
+from images import *
 """
 Clases:
 
@@ -80,8 +81,8 @@ class Wall(Structure):
 
 class Pekka(Troop):
     def __init__(self, x0, y0):
-        super().__init__(x0, y0, width=32, height=32, max_health=100, range=16)
-        self.image = "black"
+        super().__init__(x0, y0, width=24, height=24, max_health=100, range=16)
+        self.image = img_pekka
         self.speed = 2
         self.attack = 25
         self.cooldown = 40
@@ -90,7 +91,7 @@ class Pekka(Troop):
 class Dragon(Troop):
     def __init__(self, x0, y0):
         super().__init__(x0, y0, width=32, height=16, max_health=80, range=64)
-        self.image = "purple"
+        self.image = img_dragon
         self.speed = 4
         self.projectiles = []
         self.cooldown = 25
@@ -99,7 +100,7 @@ class Dragon(Troop):
 class Knight(Troop):
     def __init__(self, x0, y0):
         super().__init__(x0, y0, width=16, height=16, max_health=100, range=16)
-        self.image = "gray"
+        self.image = img_knight
         self.speed = 3
         self.attack = 20
         self.cooldown = 30
@@ -107,8 +108,8 @@ class Knight(Troop):
 
 class Archer(Troop):
     def __init__(self, x0, y0):
-        super().__init__(x0, y0, width=8, height=16, max_health=60, range=96)
-        self.image = "pink"
+        super().__init__(x0, y0, width=10, height=12, max_health=60, range=96)
+        self.image = img_archer
         self.speed = 3
         self.projectiles = []
         self.cooldown = 20
@@ -116,8 +117,8 @@ class Archer(Troop):
 
 class Giant(Troop):
     def __init__(self, x0, y0):
-        super().__init__(x0, y0, width=48, height=48, max_health=300, range=16)
-        self.image = "orange"
+        super().__init__(x0, y0, width=56, height=58, max_health=300, range=16)
+        self.image = img_giant
         self.speed = 1
         self.attack = 35
         self.cooldown = 60
@@ -125,8 +126,8 @@ class Giant(Troop):
 
 class Goblin(Troop):
     def __init__(self, x0, y0):
-        super().__init__(x0, y0, width=8, height=8, max_health=40, range=16)
-        self.image = "green"
+        super().__init__(x0, y0, width=10, height=10, max_health=40, range=16)
+        self.image = img_goblin
         self.speed = 5
         self.attack = 8
         self.cooldown = 15

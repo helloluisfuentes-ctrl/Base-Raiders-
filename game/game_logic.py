@@ -52,8 +52,8 @@ def draw_raiders():
         if raider.actual_health <= 0:
             list_raiders.remove(raider)
             continue
-        canvas_field.create_rectangle(raider.x0, raider.y0, raider.x1, raider.y1,
-                                      fill=raider.image, outline="black", width=2)
+        
+        canvas_field.create_image(raider.x0, raider.y0, image=raider.image, anchor="nw")
         draw_hp(raider)
 
 
