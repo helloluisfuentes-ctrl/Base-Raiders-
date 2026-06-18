@@ -1,0 +1,8 @@
+{
+    "TestPlayer": {
+        "username": "TestPlayer",
+        "password": "test1234",
+        "attack_wins": 1,
+        "defense_wins": 0
+    }
+}
