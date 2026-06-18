@@ -1,6 +1,7 @@
 import constants
 from ui_screens import *
 from classes import *
+from file_manager import update_player_wins
 
 
 # ==========================================================================================
@@ -14,12 +15,16 @@ def check_win():
         
 def show_raiders_win():
     """Detiene el juego y muestra pantalla de victoria para los raiders."""
+    if constants.current_attacker:
+        update_player_wins(constants.current_attacker, "attack")
     constants.running = "win"
     game_frame.pack_forget()
     win_raiders_frame.pack()
 
 def show_defense_win():
     """Detiene el juego y muestra pantalla de victoria para la defensa."""
+    if constants.current_defender:
+        update_player_wins(constants.current_defender, "defense")
     constants.running = "win"
     game_frame.pack_forget()
     win_defense_frame.pack()

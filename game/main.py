@@ -5,8 +5,7 @@ from ui_functions import *
 from buttons import *
 
 
-#testing delete
-start_plan_defense()
+show_main_menu()
 
 
 

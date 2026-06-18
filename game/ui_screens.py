@@ -14,6 +14,8 @@ win_raiders_frame = tk.Frame(root)
 
 win_defense_frame = tk.Frame(root)
 
+main_menu_frame = tk.Frame(root)
+
 # =========================================================================================
 #   CANVAS
 # =========================================================================================
@@ -61,5 +63,13 @@ canvas_win_defense = tk.Canvas(
     bg="blue"
 )
 canvas_win_defense.pack()
+
+canvas_main_menu = tk.Canvas(
+    main_menu_frame,
+    width= CELL_SIZE * 32 ,
+    height= CELL_SIZE * 24,
+    bg="darkgreen"
+)
+canvas_main_menu.pack()
 
 
