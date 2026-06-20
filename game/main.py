@@ -11,15 +11,18 @@ Versión: 1.0
 
 from py_compile import main
 import tkinter as tk
-from pathlib import Path
-
-# Importar módulos del proyecto
-from players_manager import PlayerManager
-from money_system import MoneySystem
-from rankings_manager import RankingManager
-from ui_windows import VentanaMenu, VentanaSeleccionJugadores, VentanaStats
+from game_loops import *
+from ui_screens import *
+from ui_functions import *
+from buttons import *
 
 
+show_main_menu()
 
-if __name__ == "__main__":
-    main()
+
+
+
+
+
+
+root.mainloop()

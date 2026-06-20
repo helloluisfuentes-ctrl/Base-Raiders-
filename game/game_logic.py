@@ -2,12 +2,16 @@ import constants
 from ui_screens import *
 from classes import *
 from file_manager import update_player_wins
+from money_management import money_manager
+from tkinter import messagebox
 
 
 # ==========================================================================================
 # Check_win
 # ==========================================================================================
 def check_win():
+    if constants.running != "game":
+        return
     if len(list_raiders) < 1:
         show_defense_win()
     elif constants.central_base.actual_health <= 0:
@@ -15,19 +19,57 @@ def check_win():
         
 def show_raiders_win():
     """Detiene el juego y muestra pantalla de victoria para los raiders."""
-    if constants.current_attacker:
-        update_player_wins(constants.current_attacker, "attack")
+    money_manager.save_previous_round_stats()
+    constants.attacker_round_wins += 1
+    if constants.attacker_round_wins >= constants.MATCH_WIN_ROUNDS:
+        if constants.current_attacker:
+            update_player_wins(constants.current_attacker, "attack")
+        constants.running = "win"
+        game_frame.pack_forget()
+        canvas_win_raiders.delete("match_info")
+        canvas_win_raiders.create_text(
+            CELL_SIZE * 16, CELL_SIZE * 11,
+            text=f"Marcador final: {constants.attacker_round_wins} - {constants.defender_round_wins}",
+            font=("Arial", 24, "bold"),
+            fill="white",
+            tags="match_info"
+        )
+        win_raiders_frame.pack()
+        return
+    finish_round("Atacante")
+
+def finish_round(winner_name):
+    """Cierra una ronda y prepara la siguiente si la partida no ha terminado."""
     constants.running = "win"
-    game_frame.pack_forget()
-    win_raiders_frame.pack()
+    messagebox.showinfo(
+        "Ronda terminada",
+        f"Gano la ronda: {winner_name}\nMarcador: Atacante {constants.attacker_round_wins} - Defensor {constants.defender_round_wins}"
+    )
+    constants.round_number += 1
+    from ui_functions import reset_game_state, start_plan_defense
+    reset_game_state(reset_match=False)
+    start_plan_defense()
 
 def show_defense_win():
     """Detiene el juego y muestra pantalla de victoria para la defensa."""
-    if constants.current_defender:
-        update_player_wins(constants.current_defender, "defense")
-    constants.running = "win"
-    game_frame.pack_forget()
-    win_defense_frame.pack()
+    money_manager.save_previous_round_stats()
+    constants.defender_round_wins += 1
+    if constants.defender_round_wins >= constants.MATCH_WIN_ROUNDS:
+        if constants.current_defender:
+            update_player_wins(constants.current_defender, "defense")
+        constants.running = "win"
+        game_frame.pack_forget()
+        canvas_win_defense.delete("match_info")
+        canvas_win_defense.create_text(
+            CELL_SIZE * 16, CELL_SIZE * 11,
+            text=f"Marcador final: {constants.attacker_round_wins} - {constants.defender_round_wins}",
+            font=("Arial", 24, "bold"),
+            fill="white",
+            tags="match_info"
+        )
+        win_defense_frame.pack()
+        return
+    finish_round("Defensor")
 
 # ==========================================================================================
 # DIBUJO
@@ -53,34 +95,42 @@ def draw_hp(unit):
 
 def draw_raiders():
     """Dibuja todos los raiders. Elimina los que tienen vida <= 0."""
-    for raider in list_raiders:
+    for raider in list_raiders[:]:
         if raider.actual_health <= 0:
             list_raiders.remove(raider)
+            if not getattr(raider, "reward_paid", False):
+                money_manager.give_defender_unit_bonus(raider)
+                raider.reward_paid = True
             continue
         
+        outline = constants.FACTIONS[constants.attacker_faction]["unit_outline"]
+        canvas_field.create_rectangle(raider.x0 - 2, raider.y0 - 2, raider.x1 + 2, raider.y1 + 2,
+                                      outline=outline, width=2)
         canvas_field.create_image(raider.x0, raider.y0, image=raider.image, anchor="nw")
         draw_hp(raider)
 
 
 def draw_towers():
     """Dibuja todas las torres. Elimina las que tienen vida <= 0."""
-    for tower in list_towers:
+    for tower in list_towers[:]:
         if tower.actual_health <= 0:
             list_towers.remove(tower)
             continue
+        outline = constants.FACTIONS[constants.defender_faction]["tower"]
         canvas_field.create_rectangle(tower.x0, tower.y0, tower.x1, tower.y1,
-                                      fill=tower.image, outline="black", width=2)
+                                      fill=tower.image, outline=outline, width=3)
         draw_hp(tower)
 
 
 def draw_walls():
     """Dibuja todas las paredes. Elimina las que tienen vida <= 0."""
-    for wall in list_walls:
+    for wall in list_walls[:]:
         if wall.actual_health <= 0:
             list_walls.remove(wall)
             continue
+        wall_color = constants.FACTIONS[constants.defender_faction]["wall"]
         canvas_field.create_rectangle(wall.x0, wall.y0, wall.x1, wall.y1,
-                                      fill="brown", outline="black", width=2)
+                                      fill=wall_color, outline="black", width=2)
         draw_hp(wall)
 
 
@@ -91,7 +141,8 @@ def draw_base():
         return
     canvas_field.create_rectangle(constants.central_base.x0, constants.central_base.y0,
                                   constants.central_base.x1, constants.central_base.y1,
-                                  fill="white", outline="black", width=2)
+                                  fill=constants.FACTIONS[constants.defender_faction]["base"],
+                                  outline="black", width=2)
     draw_hp(constants.central_base)
 
 
@@ -233,7 +284,7 @@ def move_projectiles_raiders():
         # verificar si el proyectil llegó al objetivo
         structure_hit = what_structure_is_in_range(projectile)
         if structure_hit:
-            structure_hit.actual_health -= projectile.attack
+            damage_structure(structure_hit, projectile.attack)
             constants.list_projectiles_raiders.remove(projectile)
 
 
@@ -248,7 +299,9 @@ def move_projectiles_towers():
         # verificar si el proyectil llegó al objetivo
         troop_hit = what_troop_is_in_range(projectile)
         if troop_hit:
-            troop_hit.actual_health -= projectile.attack
+            damage_troop(troop_hit, projectile.attack)
+            if isinstance(projectile, WizardSpell):
+                apply_area_damage(projectile, troop_hit, 10)
             constants.list_projectiles_towers.remove(projectile)
 
 # ==========================================================================================
@@ -273,17 +326,41 @@ def attack_structure(troop, structure):
         shoot_structure(troop)
     # Ataque melee: daño directo
     else:
-        structure.actual_health -= troop.attack
+        attack_amount = troop.attack
+        troop.attack_count += 1
+        if isinstance(troop, Knight) and troop.attack_count % troop.ability_turns == 0:
+            attack_amount *= 2
+        if isinstance(troop, Pekka) and isinstance(structure, Tower):
+            attack_amount += 15
+        damage_structure(structure, attack_amount)
 
     troop.cooldown_timer = troop.cooldown
+
+
+def damage_structure(structure, attack_amount):
+    """Aplica dano a estructuras y recompensa al atacante por el dano real."""
+    damage_done = min(attack_amount, max(0, structure.actual_health))
+    structure.actual_health -= attack_amount
+    if damage_done > 0:
+        money_manager.give_attacker_damage_bonus(damage_done)
+    if isinstance(structure, Tower) and structure.actual_health <= 0 and not getattr(structure, "destroy_bonus_paid", False):
+        money_manager.give_tower_destroy_bonus()
+        structure.destroy_bonus_paid = True
 
 
 def shoot_structure(troop):
     """Crea el proyectil correspondiente al troop y lo agrega a list_projectiles_raiders."""
     if isinstance(troop, Archer):
         constants.list_projectiles_raiders.append(ArcherArrow(troop.x0, troop.y0))
+        troop.attack_count += 1
+        if troop.attack_count % troop.ability_turns == 0:
+            constants.list_projectiles_raiders.append(ArcherArrow(troop.x0 + 6, troop.y0))
     elif isinstance(troop, Dragon):
-        constants.list_projectiles_raiders.append(DragonFireball(troop.x0, troop.y0))
+        fireball = DragonFireball(troop.x0, troop.y0)
+        troop.attack_count += 1
+        if troop.attack_count % troop.ability_turns == 0:
+            fireball.attack += 10
+        constants.list_projectiles_raiders.append(fireball)
 
 
 def attack_troop(structure, troop):
@@ -298,12 +375,17 @@ def attack_troop(structure, troop):
         structure.cooldown_timer -= 1
         return
 
+    structure.attack_count += 1
     # Ataque ranged: dispara proyectil
     if isinstance(structure, (Wizard_tower, Crossbow_tower)):
         shoot_troop(structure)
+        if isinstance(structure, Crossbow_tower) and structure.attack_count % structure.ability_turns == 0:
+            shoot_troop(structure)
     # Ataque melee: daño directo (Spiky_tower)
     else:
-        troop.actual_health -= structure.attack
+        damage_troop(troop, structure.attack)
+        if structure.attack_count % structure.ability_turns == 0:
+            troop.speed = max(1, troop.speed - 1)
 
     structure.cooldown_timer = structure.cooldown
 
@@ -314,6 +396,22 @@ def shoot_troop(structure):
         constants.list_projectiles_towers.append(WizardSpell(structure.x0, structure.y0))
     elif isinstance(structure, Crossbow_tower):
         constants.list_projectiles_towers.append(CrossbowBolt(structure.x0, structure.y0))
+
+
+def damage_troop(troop, attack_amount):
+    """Aplica dano a una unidad, tomando en cuenta habilidades defensivas."""
+    if isinstance(troop, Giant):
+        attack_amount = max(1, attack_amount - 5)
+    troop.actual_health -= attack_amount
+
+
+def apply_area_damage(projectile, main_target, attack_amount):
+    """Habilidad de torre magica: dana unidades cercanas al objetivo principal."""
+    for troop in list_raiders[:]:
+        if troop is main_target:
+            continue
+        if abs(troop.x0 - main_target.x0) <= CELL_SIZE and abs(troop.y0 - main_target.y0) <= CELL_SIZE:
+            damage_troop(troop, attack_amount)
 
 
 # ==========================================================================================

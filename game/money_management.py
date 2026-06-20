@@ -63,16 +63,47 @@ class MoneyManager:
         """Da ingreso al inicio de la ronda a ambos jugadores."""
         self.add_attacker_money(constants.ROUND_INCOME)
         self.add_defender_money(constants.ROUND_INCOME)
+
+    def give_previous_round_bonuses(self):
+        """Aplica los bonos ganados en la ronda anterior."""
+        attacker_bonus = int(constants.previous_round_damage_dealt * constants.ATTACKER_DAMAGE_REWARD_RATE)
+        defender_bonus = constants.previous_round_enemies_killed * constants.DEFENDER_KILL_REWARD
+        self.add_attacker_money(attacker_bonus)
+        self.add_defender_money(defender_bonus)
+        constants.previous_round_damage_dealt = 0
+        constants.previous_round_enemies_killed = 0
+        return attacker_bonus, defender_bonus
+
+    def save_previous_round_stats(self):
+        """Guarda el resultado de la ronda actual para calcular bonos futuros."""
+        constants.previous_round_damage_dealt = constants.round_damage_dealt
+        constants.previous_round_enemies_killed = constants.round_enemies_killed
     
     def give_attacker_damage_bonus(self, damage_amount):
         """Da bonificación al atacante por daño realizado."""
-        bonus = int(damage_amount * 0.1)  # 10% del daño como bonificación
+        constants.round_damage_dealt += damage_amount
+        bonus = int(damage_amount * constants.ATTACKER_DAMAGE_REWARD_RATE)
         self.add_attacker_money(bonus)
+        return bonus
     
     def give_defender_kill_bonus(self, kill_count):
         """Da bonificación al defensor por unidades enemigas eliminadas."""
-        bonus = kill_count * 50  # 50 monedas por unidad eliminada
+        constants.round_enemies_killed += kill_count
+        bonus = kill_count * constants.DEFENDER_KILL_REWARD
         self.add_defender_money(bonus)
+        return bonus
+
+    def give_defender_unit_bonus(self, troop):
+        """Da dinero al defensor segun el tipo de unidad eliminada."""
+        constants.round_enemies_killed += 1
+        bonus = getattr(troop, "reward", constants.DEFENDER_KILL_REWARD)
+        self.add_defender_money(bonus)
+        return bonus
+
+    def give_tower_destroy_bonus(self):
+        """Da dinero extra al atacante por destruir una torre."""
+        self.add_attacker_money(constants.TOWER_DESTROY_REWARD)
+        return constants.TOWER_DESTROY_REWARD
     
     # ===== VALIDAR COMPRA =====
     
@@ -122,6 +153,8 @@ class MoneyManager:
         """Resetea el dinero al valor inicial para una nueva ronda."""
         constants.attacker_money = constants.INITIAL_MONEY
         constants.defender_money = constants.INITIAL_MONEY
+        constants.round_damage_dealt = 0
+        constants.round_enemies_killed = 0
 
 
 # Instancia global

@@ -2,6 +2,7 @@ from ui_screens import *
 from classes import *
 import constants
 from game_loops import *
+from money_management import money_manager
 
 # ==========================================================================================
 # MANEJO DE ESTADOS DEL JUEGO
@@ -9,11 +10,15 @@ from game_loops import *
 
 def start_plan_defense():
     """Inicia la fase de planeación de defensa. Coloca la base central y arranca el loop."""
+    money_manager.reset_round_money()
+    money_manager.give_round_income()
+    money_manager.give_previous_round_bonuses()
     game_frame.pack()
     canvas_field.pack()
     canvas_menu_plan_defense.pack()
     constants.central_base = Base(x0=CELL_SIZE * 2, y0=CELL_SIZE * 7)
     constants.running = "plan"
+    update_money_display()
     root.after(32, planning_loop)
 
 
@@ -22,6 +27,7 @@ def start_plan_attack():
     canvas_menu_plan_defense.pack_forget()
     constants.selected_element = None
     canvas_menu_plan_attack.pack()
+    update_money_display()
 
 
 def start_game():
@@ -30,6 +36,7 @@ def start_game():
     canvas_menu_on_game.pack()
     constants.selected_element = None
     constants.running = "game"
+    update_money_display()
     root.after(32, on_game_loop)
 
 # ==========================================================================================
@@ -39,6 +46,42 @@ def start_game():
 def select_element(element):
     """Guarda el elemento seleccionado para ser colocado al hacer clic en el campo."""
     constants.selected_element = element
+
+
+def update_money_display():
+    """Actualiza los textos de dinero en los menus."""
+    canvas_menu_plan_defense.delete("money_info")
+    canvas_menu_plan_attack.delete("money_info")
+    canvas_menu_on_game.delete("money_info")
+
+    canvas_menu_plan_defense.create_text(
+        CELL_SIZE * 6, CELL_SIZE * 6,
+        text=f"Ronda {constants.round_number}   Defensor: ${constants.defender_money}   Marcador {constants.attacker_round_wins}-{constants.defender_round_wins}",
+        font=("Arial", 22, "bold"),
+        fill="darkgreen",
+        tags="money_info"
+    )
+    canvas_menu_plan_attack.create_text(
+        CELL_SIZE * 6, CELL_SIZE * 6,
+        text=f"Ronda {constants.round_number}   Atacante: ${constants.attacker_money}   Marcador {constants.attacker_round_wins}-{constants.defender_round_wins}",
+        font=("Arial", 22, "bold"),
+        fill="darkred",
+        tags="money_info"
+    )
+    canvas_menu_on_game.create_text(
+        CELL_SIZE * 6, CELL_SIZE * 2,
+        text=f"Ronda {constants.round_number}   Atacante: ${constants.attacker_money}   Defensor: ${constants.defender_money}",
+        font=("Arial", 22, "bold"),
+        fill="black",
+        tags="money_info"
+    )
+    canvas_menu_on_game.create_text(
+        CELL_SIZE * 6, CELL_SIZE * 4,
+        text=f"Dano atacante: {constants.round_damage_dealt}   Bajas defensa: {constants.round_enemies_killed}",
+        font=("Arial", 18, "bold"),
+        fill="black",
+        tags="money_info"
+    )
 
 
 # ==========================================================================================
@@ -91,17 +134,25 @@ def place_troop(event):
     sel = constants.selected_element
 
     if sel == "knight":
-        list_raiders.append(Knight(event.x, event.y))
+        if money_manager.spend_attacker_money(money_manager.get_knight_cost()):
+            list_raiders.append(Knight(event.x, event.y))
     elif sel == "goblin":
-        list_raiders.append(Goblin(event.x, event.y))
+        if money_manager.spend_attacker_money(money_manager.get_goblin_cost()):
+            list_raiders.append(Goblin(event.x, event.y))
     elif sel == "archer":
-        list_raiders.append(Archer(event.x, event.y))
+        if money_manager.spend_attacker_money(money_manager.get_archer_cost()):
+            list_raiders.append(Archer(event.x, event.y))
     elif sel == "giant":
-        list_raiders.append(Giant(event.x, event.y))
+        if money_manager.spend_attacker_money(money_manager.get_giant_cost()):
+            list_raiders.append(Giant(event.x, event.y))
     elif sel == "dragon":
-        list_raiders.append(Dragon(event.x, event.y))
+        if money_manager.spend_attacker_money(money_manager.get_dragon_cost()):
+            list_raiders.append(Dragon(event.x, event.y))
     elif sel == "pekka":
-        list_raiders.append(Pekka(event.x, event.y))
+        if money_manager.spend_attacker_money(money_manager.get_pekka_cost()):
+            list_raiders.append(Pekka(event.x, event.y))
+
+    update_money_display()
 
 
 def place_tower(event):
@@ -121,11 +172,16 @@ def place_tower(event):
     sel = constants.selected_element
 
     if sel == "wzrd_tower":
-        list_towers.append(Wizard_tower(gx, gy))
+        if money_manager.spend_defender_money(money_manager.get_wizard_tower_cost()):
+            list_towers.append(Wizard_tower(gx, gy))
     elif sel == "crsbw_tower":
-        list_towers.append(Crossbow_tower(gx, gy))
+        if money_manager.spend_defender_money(money_manager.get_crossbow_tower_cost()):
+            list_towers.append(Crossbow_tower(gx, gy))
     elif sel == "spk_tower":
-        list_towers.append(Spiky_tower(gx, gy))
+        if money_manager.spend_defender_money(money_manager.get_spiky_tower_cost()):
+            list_towers.append(Spiky_tower(gx, gy))
+
+    update_money_display()
 
 
 def place_wall(event):
@@ -140,7 +196,9 @@ def place_wall(event):
 
     gx = event.x - event.x % CELL_SIZE
     gy = event.y - event.y % CELL_SIZE
-    list_walls.append(Wall(gx, gy))
+    if money_manager.spend_defender_money(money_manager.get_wall_cost()):
+        list_walls.append(Wall(gx, gy))
+    update_money_display()
 
 
 def delete_structure(event):
@@ -148,11 +206,15 @@ def delete_structure(event):
     for wall in list_walls[:]:
         if wall.x0 <= event.x <= wall.x1 and wall.y0 <= event.y <= wall.y1:
             list_walls.remove(wall)
+            money_manager.add_defender_money(getattr(wall, "cost", money_manager.get_wall_cost()))
+            update_money_display()
             return
 
     for tower in list_towers[:]:
         if tower.x0 <= event.x <= tower.x1 and tower.y0 <= event.y <= tower.y1:
             list_towers.remove(tower)
+            money_manager.add_defender_money(getattr(tower, "cost", 0))
+            update_money_display()
             return
 
 
@@ -161,6 +223,9 @@ def delete_troop(event):
     for troop in list_raiders[:]:
         if troop.x0 <= event.x <= troop.x1 and troop.y0 <= event.y <= troop.y1:
             list_raiders.remove(troop)
+            money_manager.add_attacker_money(getattr(troop, "cost", 0))
+            update_money_display()
+            return
 
 
 # ==========================================================================================
@@ -206,7 +271,7 @@ def hide_main_menu():
     main_menu_frame.pack_forget()
 
 
-def reset_game_state():
+def reset_game_state(reset_match=True):
     """Resetea el estado del juego para una nueva partida."""
     # Limpiar listas de elementos
     list_raiders.clear()
@@ -219,10 +284,20 @@ def reset_game_state():
     constants.central_base = None
     constants.selected_element = None
     constants.running = None
+    canvas_menu_plan_defense.pack_forget()
+    canvas_menu_plan_attack.pack_forget()
+    canvas_menu_on_game.pack_forget()
+    canvas_field.delete("all")
     
     # Resetear dinero
     from money_management import money_manager
     money_manager.reset_round_money()
+    if reset_match:
+        constants.attacker_round_wins = 0
+        constants.defender_round_wins = 0
+        constants.round_number = 1
+        constants.previous_round_damage_dealt = 0
+        constants.previous_round_enemies_killed = 0
 
 
 def return_to_main_menu():
