@@ -190,3 +190,49 @@ def place_element(event):
 
 
 canvas_field.bind("<Button-1>", place_element)
+
+# ==========================================================================================
+# MENÚ PRINCIPAL
+# ==========================================================================================
+
+def show_main_menu():
+    """Muestra el menú principal."""
+    main_menu_frame.pack()
+    canvas_main_menu.pack()
+
+
+def hide_main_menu():
+    """Oculta el menú principal."""
+    main_menu_frame.pack_forget()
+
+
+def reset_game_state():
+    """Resetea el estado del juego para una nueva partida."""
+    # Limpiar listas de elementos
+    list_raiders.clear()
+    list_walls.clear()
+    list_towers.clear()
+    list_projectiles_raiders.clear()
+    list_projectiles_towers.clear()
+    
+    # Resetear variables
+    constants.central_base = None
+    constants.selected_element = None
+    constants.running = None
+    
+    # Resetear dinero
+    from money_management import money_manager
+    money_manager.reset_round_money()
+
+
+def return_to_main_menu():
+    """Retorna al menú principal desde la pantalla de victoria."""
+    # Ocultar pantallas de victoria
+    win_raiders_frame.pack_forget()
+    win_defense_frame.pack_forget()
+    
+    # Resetear estado del juego
+    reset_game_state()
+    
+    # Mostrar menú principal
+    show_main_menu()

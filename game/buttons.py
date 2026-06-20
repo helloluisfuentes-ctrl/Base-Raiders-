@@ -1,5 +1,7 @@
 from ui_functions import *
 from tkinter import font
+from player_selection import PlayerSelectionWindow
+from stats_window import StatsWindow
 
 # ==========================================================================================
 # FUENTES
@@ -7,6 +9,7 @@ from tkinter import font
 
 large_font = font.Font(family="Comic Sans MS", size=40)
 small_font = font.Font(family="Comic Sans MS", size=18)
+huge_font = font.Font(family="Comic Sans MS", size=60)
 
 # ==========================================================================================
 # MENÚ DE DEFENSA
@@ -75,3 +78,26 @@ dragon_btn.place(x=CELL_SIZE * 25, y=CELL_SIZE * 3)
 pekka_btn = tk.Button(canvas_menu_plan_attack, text="Pekka", width=12,
                       font=small_font, command=lambda: select_element("pekka"))
 pekka_btn.place(x=CELL_SIZE * 25, y=CELL_SIZE * 5)
+
+# ==========================================================================================
+# MENÚ PRINCIPAL
+# ==========================================================================================
+
+def open_player_selection():
+    """Abre la ventana de selección de jugadores."""
+    PlayerSelectionWindow(root)
+
+def open_stats_window():
+    """Abre la ventana de estadísticas."""
+    StatsWindow(root)
+
+# Botones del menú principal
+play_btn = tk.Button(canvas_main_menu, text="PLAY", width=20,
+                     font=huge_font, command=open_player_selection,
+                     bg="green", fg="white")
+play_btn.place(x=CELL_SIZE * 5, y=CELL_SIZE * 7)
+
+stats_btn = tk.Button(canvas_main_menu, text="STATS", width=20,
+                      font=huge_font, command=open_stats_window,
+                      bg="yellow", fg="black")
+stats_btn.place(x=CELL_SIZE * 5, y=CELL_SIZE * 14)
