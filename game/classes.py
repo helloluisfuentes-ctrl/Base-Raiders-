@@ -48,6 +48,12 @@ class Unit:
         self.max_health = max_health
         self.actual_health = max_health
         self.range = range
+        self.name = self.__class__.__name__
+        self.cost = 0
+        self.attack_count = 0
+        self.ability_name = "Sin habilidad"
+        self.ability_turns = 0
+        self.reward = 50
 
 # ---------------------------------------------------------------------------
 
@@ -72,10 +78,13 @@ class Tower(Unit):
 class Base(Structure):
     def __init__(self, x0, y0):
         super().__init__(x0, y0, width=64, height=64, max_health=500, range=0)
+        self.name = "Base Central"
         
 class Wall(Structure):
     def __init__(self, x0, y0):
         super().__init__(x0, y0, width=32, height=32, max_health=200, range=0)
+        self.name = "Muro"
+        self.cost = 75
         
 # ----------------------------------------------------------------------------
 
@@ -87,6 +96,10 @@ class Pekka(Troop):
         self.attack = 25
         self.cooldown = 40
         self.cooldown_timer = 0
+        self.cost = 150
+        self.reward = 90
+        self.ability_name = "Rompe torres"
+        self.ability_turns = 1
 
 class Dragon(Troop):
     def __init__(self, x0, y0):
@@ -96,6 +109,10 @@ class Dragon(Troop):
         self.projectiles = []
         self.cooldown = 25
         self.cooldown_timer = 0
+        self.cost = 180
+        self.reward = 100
+        self.ability_name = "Fuego potenciado"
+        self.ability_turns = 3
         
 class Knight(Troop):
     def __init__(self, x0, y0):
@@ -105,6 +122,10 @@ class Knight(Troop):
         self.attack = 20
         self.cooldown = 30
         self.cooldown_timer = 0
+        self.cost = 100
+        self.reward = 60
+        self.ability_name = "Ataque doble"
+        self.ability_turns = 3
 
 class Archer(Troop):
     def __init__(self, x0, y0):
@@ -114,6 +135,10 @@ class Archer(Troop):
         self.projectiles = []
         self.cooldown = 20
         self.cooldown_timer = 0
+        self.cost = 120
+        self.reward = 70
+        self.ability_name = "Doble flecha"
+        self.ability_turns = 4
 
 class Giant(Troop):
     def __init__(self, x0, y0):
@@ -123,6 +148,10 @@ class Giant(Troop):
         self.attack = 35
         self.cooldown = 60
         self.cooldown_timer = 0
+        self.cost = 200
+        self.reward = 120
+        self.ability_name = "Escudo pesado"
+        self.ability_turns = 1
 
 class Goblin(Troop):
     def __init__(self, x0, y0):
@@ -132,6 +161,10 @@ class Goblin(Troop):
         self.attack = 8
         self.cooldown = 15
         self.cooldown_timer = 0
+        self.cost = 50
+        self.reward = 40
+        self.ability_name = "Aumento de velocidad"
+        self.ability_turns = 1
 
 # ----------------------------------------------------------------------------
 
@@ -142,6 +175,10 @@ class Wizard_tower(Tower):
         self.projectiles = []
         self.cooldown = 35
         self.cooldown_timer = 0
+        self.cost = 200
+        self.attack = 30
+        self.ability_name = "Dano en area"
+        self.ability_turns = 3
 
 class Crossbow_tower(Tower):
     def __init__(self, x0, y0):
@@ -150,6 +187,10 @@ class Crossbow_tower(Tower):
         self.projectiles = []
         self.cooldown = 20
         self.cooldown_timer = 0
+        self.cost = 180
+        self.attack = 15
+        self.ability_name = "Disparo doble"
+        self.ability_turns = 3
 
 class Spiky_tower(Tower):
     def __init__(self, x0, y0):
@@ -158,6 +199,9 @@ class Spiky_tower(Tower):
         self.attack = 20
         self.cooldown = 25
         self.cooldown_timer = 0
+        self.cost = 150
+        self.ability_name = "Congelar unidad"
+        self.ability_turns = 4
         
 # ------------------------------------------------------------------------------
 

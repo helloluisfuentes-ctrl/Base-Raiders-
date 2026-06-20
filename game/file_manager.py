@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 
 # Ruta del archivo de jugadores
-PLAYERS_FILE = "players.json"
+PLAYERS_FILE = Path(__file__).resolve().parent / "game_data" / "players.json"
 
 # ==========================================================================================
 # CARGAR Y GUARDAR JUGADORES
@@ -23,6 +23,7 @@ def load_players():
 def save_players(players_dict):
     """Guarda el diccionario de jugadores en players.json."""
     try:
+        PLAYERS_FILE.parent.mkdir(exist_ok=True)
         with open(PLAYERS_FILE, "w", encoding="utf-8") as f:
             json.dump(players_dict, f, indent=4, ensure_ascii=False)
     except Exception as e:
