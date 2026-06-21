@@ -90,10 +90,10 @@ class Wall(Structure):
 
 class Pekka(Troop):
     def __init__(self, x0, y0):
-        super().__init__(x0, y0, width=24, height=24, max_health=100, range=16)
+        super().__init__(x0, y0, width=24, height=24, max_health=100, range=8)
         self.image = img_pekka
         self.speed = 2
-        self.attack = 25
+        self.attack = 35
         self.cooldown = 40
         self.cooldown_timer = 0
         self.cost = 150
@@ -116,7 +116,7 @@ class Dragon(Troop):
         
 class Knight(Troop):
     def __init__(self, x0, y0):
-        super().__init__(x0, y0, width=16, height=16, max_health=100, range=16)
+        super().__init__(x0, y0, width=16, height=16, max_health=100, range=8)
         self.image = img_knight
         self.speed = 3
         self.attack = 20
@@ -142,10 +142,10 @@ class Archer(Troop):
 
 class Giant(Troop):
     def __init__(self, x0, y0):
-        super().__init__(x0, y0, width=56, height=58, max_health=300, range=16)
+        super().__init__(x0, y0, width=56, height=58, max_health=300, range=8)
         self.image = img_giant
         self.speed = 1
-        self.attack = 35
+        self.attack = 60
         self.cooldown = 60
         self.cooldown_timer = 0
         self.cost = 200
@@ -155,7 +155,7 @@ class Giant(Troop):
 
 class Goblin(Troop):
     def __init__(self, x0, y0):
-        super().__init__(x0, y0, width=10, height=10, max_health=40, range=16)
+        super().__init__(x0, y0, width=10, height=10, max_health=40, range=8)
         self.image = img_goblin
         self.speed = 5
         self.attack = 8
@@ -171,6 +171,7 @@ class Goblin(Troop):
 class Wizard_tower(Tower):
     def __init__(self, x0, y0):
         super().__init__(x0, y0, width=32, height=32, max_health=250, range=180)
+        self.name = "wizard_tower"
         self.image = "blue"
         self.projectiles = []
         self.cooldown = 35
@@ -183,20 +184,22 @@ class Wizard_tower(Tower):
 class Crossbow_tower(Tower):
     def __init__(self, x0, y0):
         super().__init__(x0, y0, width=32, height=32, max_health=200, range=250)
+        self.name = "crossbow_tower"
         self.image = "lightblue"
         self.projectiles = []
-        self.cooldown = 20
+        self.cooldown = 5
         self.cooldown_timer = 0
         self.cost = 180
-        self.attack = 15
+        self.attack = 2
         self.ability_name = "Disparo doble"
         self.ability_turns = 3
 
 class Spiky_tower(Tower):
     def __init__(self, x0, y0):
-        super().__init__(x0, y0, width=32, height=32, max_health=150, range=100)
+        super().__init__(x0, y0, width=32, height=32, max_health=150, range=16)
+        self.name = "spiky_tower"
         self.image = "yellow"
-        self.attack = 20
+        self.attack = 50
         self.cooldown = 25
         self.cooldown_timer = 0
         self.cost = 150
@@ -210,25 +213,25 @@ class DragonFireball(Unit):
         super().__init__(x0, y0, width=8, height=8, max_health=1, range=1)
         self.attack = 15
         self.speed = 6
-        self.image = "orange red"
+        self.image = img_dragon_fireball
 
 class ArcherArrow(Unit):
     def __init__(self, x0, y0):
         super().__init__(x0, y0, width=4, height=4, max_health=1, range=1)
         self.attack = 10
         self.speed = 8
-        self.image = "brown"
+        self.image = img_archer_arrow
 
 class WizardSpell(Unit):
     def __init__(self, x0, y0):
         super().__init__(x0, y0, width=8, height=8, max_health=1, range=1)
         self.attack = 30
         self.speed = 5
-        self.image = "deep sky blue"
+        self.image = img_wizard_spell
 
 class CrossbowBolt(Unit):
     def __init__(self, x0, y0):
         super().__init__(x0, y0, width=4, height=4, max_health=1, range=1)
-        self.attack = 15
+        self.attack = 4
         self.speed = 10
-        self.image = "dark gray"
+        self.image = img_crossbow_bolt

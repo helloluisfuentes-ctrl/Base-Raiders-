@@ -4,6 +4,7 @@ from classes import *
 from file_manager import update_player_wins
 from money_management import money_manager
 from tkinter import messagebox
+import images
 
 
 # ==========================================================================================
@@ -103,9 +104,9 @@ def draw_raiders():
                 raider.reward_paid = True
             continue
         
-        outline = constants.FACTIONS[constants.attacker_faction]["unit_outline"]
-        canvas_field.create_rectangle(raider.x0 - 2, raider.y0 - 2, raider.x1 + 2, raider.y1 + 2,
-                                      outline=outline, width=2)
+        outline = images.FACTIONS[constants.attacker_faction]["unit_outline"]
+        canvas_field.create_line(raider.x0 + 2, raider.y1 + 2, raider.x1 - 2, raider.y1 + 2,
+                                      fill=outline, width=2)
         canvas_field.create_image(raider.x0, raider.y0, image=raider.image, anchor="nw")
         draw_hp(raider)
 
@@ -116,9 +117,10 @@ def draw_towers():
         if tower.actual_health <= 0:
             list_towers.remove(tower)
             continue
-        outline = constants.FACTIONS[constants.defender_faction]["tower"]
-        canvas_field.create_rectangle(tower.x0, tower.y0, tower.x1, tower.y1,
-                                      fill=tower.image, outline=outline, width=3)
+        
+        image_var = images.FACTIONS[constants.defender_faction][tower.name]
+        
+        canvas_field.create_image(tower.x0, tower.y0, image=image_var, anchor="nw")
         draw_hp(tower)
 
 
@@ -128,9 +130,8 @@ def draw_walls():
         if wall.actual_health <= 0:
             list_walls.remove(wall)
             continue
-        wall_color = constants.FACTIONS[constants.defender_faction]["wall"]
-        canvas_field.create_rectangle(wall.x0, wall.y0, wall.x1, wall.y1,
-                                      fill=wall_color, outline="black", width=2)
+        image_var = images.FACTIONS[constants.defender_faction]["wall"]
+        canvas_field.create_image(wall.x0, wall.y0, image=image_var, anchor ="nw")
         draw_hp(wall)
 
 
@@ -139,25 +140,22 @@ def draw_base():
     if constants.central_base.actual_health <= 0:
         check_win()
         return
-    canvas_field.create_rectangle(constants.central_base.x0, constants.central_base.y0,
-                                  constants.central_base.x1, constants.central_base.y1,
-                                  fill=constants.FACTIONS[constants.defender_faction]["base"],
-                                  outline="black", width=2)
+    
+    image_var = images.FACTIONS[constants.defender_faction]["base"]
+    canvas_field.create_image(constants.central_base.x0, constants.central_base.y0, image= image_var, anchor = "nw")
     draw_hp(constants.central_base)
 
 
 def draw_projectiles_raiders():
     """Dibuja los proyectiles de los raiders (flechas, bolas de fuego)."""
     for projectile in constants.list_projectiles_raiders:
-        canvas_field.create_rectangle(projectile.x0, projectile.y0, projectile.x1, projectile.y1,
-                                      fill=projectile.image, outline="")
+        canvas_field.create_image(projectile.x0, projectile.y0, image = projectile.image, anchor = "nw")
 
 
 def draw_projectiles_towers():
     """Dibuja los proyectiles de las torres (hechizos, ballestas)."""
     for projectile in constants.list_projectiles_towers:
-        canvas_field.create_rectangle(projectile.x0, projectile.y0, projectile.x1, projectile.y1,
-                                      fill=projectile.image, outline="")
+        canvas_field.create_image(projectile.x0, projectile.y0, image= projectile.image)
 
 
 # ==========================================================================================

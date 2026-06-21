@@ -46,5 +46,15 @@
         "password": "pass2",
         "attack_wins": 0,
         "defense_wins": 1
+    },
+    "luis": {
+        "password": "1234",
+        "attack_wins": 1,
+        "defense_wins": 0
+    },
+    "elian": {
+        "password": "1234",
+        "attack_wins": 0,
+        "defense_wins": 2
     }
 }

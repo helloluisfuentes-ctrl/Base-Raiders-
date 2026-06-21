@@ -1,3 +1,5 @@
+
+
 # ====================================================================================
 # Constantes globales
 # ====================================================================================
@@ -30,32 +32,7 @@ defender_round_wins = 0
 round_number = 1
 MATCH_WIN_ROUNDS = 3
 
-# ====================================================================================
-# Variables globales - FACCIONES
-# ====================================================================================
 
-FACTIONS = {
-    "Medieval": {
-        "base": "white",
-        "wall": "saddle brown",
-        "tower": "royal blue",
-        "unit_outline": "gold"
-    },
-    "Futurista": {
-        "base": "cyan",
-        "wall": "gray35",
-        "tower": "deep sky blue",
-        "unit_outline": "cyan"
-    },
-    "Naturaleza": {
-        "base": "pale green",
-        "wall": "forest green",
-        "tower": "dark olive green",
-        "unit_outline": "lime green"
-    }
-}
-attacker_faction = "Medieval"
-defender_faction = "Futurista"
 
 # ====================================================================================
 # Variables globales - DINERO
@@ -73,3 +50,26 @@ round_damage_dealt = 0
 round_enemies_killed = 0
 previous_round_damage_dealt = 0
 previous_round_enemies_killed = 0
+
+# ====================================================================================
+# Variables globales - FACCIONES
+# ====================================================================================
+
+FACTIONS = {
+    "Medieval": {
+        
+    },
+    "Futurista": {
+        
+    },
+    "Naturaleza": {
+        
+    }
+}
+
+
+
+
+
+attacker_faction = "Medieval"
+defender_faction = "Futurista"
