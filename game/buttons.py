@@ -19,15 +19,19 @@ title_font = font.Font(family="Comic Sans MS", size=54, weight="bold")
 # ==========================================================================================
 
 # --- Acciones ---
+
 ready_btn = tk.Button(canvas_menu_plan_defense, text="Ready", width=10,
                       font=large_font, command=lambda: start_plan_attack())
 ready_btn.place(x=CELL_SIZE * 1, y=CELL_SIZE * 1)
+# Confirma la planeación de defensa y pasa a la planeación de ataque
 
 delete_btn1 = tk.Button(canvas_menu_plan_defense, text="Delete", width=10,
                          font=small_font, command=lambda: select_element("delete_structure"))
 delete_btn1.place(x=CELL_SIZE * 12, y=CELL_SIZE * 1)
+# Activa el modo de borrado de estructuras (muros y torres)
 
 # --- Estructuras ---
+
 wall_btn = tk.Button(canvas_menu_plan_defense, text="Wall $75", width=12,
                      font=small_font, command=lambda: select_element("wall"))
 wall_btn.place(x=CELL_SIZE * 19, y=CELL_SIZE * 1)
@@ -49,15 +53,19 @@ spk_tower_btn.place(x=CELL_SIZE * 25, y=CELL_SIZE * 5)
 # ==========================================================================================
 
 # --- Acciones ---
+
 start_btn = tk.Button(canvas_menu_plan_attack, text="Start", width=10,
                       font=large_font, command=lambda: start_game())
 start_btn.place(x=CELL_SIZE * 1, y=CELL_SIZE * 1)
+# Confirma la planeación de ataque y arranca la partida
 
 delete_btn2 = tk.Button(canvas_menu_plan_attack, text="Delete", width=10,
                          font=small_font, command=lambda: select_element("delete_troop"))
 delete_btn2.place(x=CELL_SIZE * 12, y=CELL_SIZE * 1)
+# Activa el modo de borrado de tropas
 
 # --- Tropas ---
+
 knight_btn = tk.Button(canvas_menu_plan_attack, text="Knight $100", width=12,
                        font=small_font, command=lambda: select_element("knight"))
 knight_btn.place(x=CELL_SIZE * 19, y=CELL_SIZE * 1)
@@ -112,6 +120,7 @@ def open_register_window():
     password_entry.pack(pady=4)
 
     def register():
+        """Valida los campos y registra al jugador, o muestra el error correspondiente."""
         username = username_entry.get().strip()
         password = password_entry.get()
         if not username or not password:
@@ -129,23 +138,30 @@ def open_register_window():
     tk.Button(window, text="Registrar", font=("Arial", 12, "bold"),
               command=register, bg="gold", width=16).pack(pady=16)
 
-# Botones del menú principal
+
+# --- Título y subtítulo ---
+
 canvas_main_menu.create_text(CELL_SIZE * 16, CELL_SIZE * 4, text="BASE RAIDERS",
                              font=title_font, fill="white")
 canvas_main_menu.create_text(CELL_SIZE * 16, CELL_SIZE * 6, text="Defensa y Asalto de Base",
                              font=("Arial", 22, "bold"), fill="lightgreen")
 
+# --- Botones ---
+
 play_btn = tk.Button(canvas_main_menu, text="JUGAR", width=18,
                      font=large_font, command=open_player_selection,
                      bg="green", fg="white")
 play_btn.place(x=CELL_SIZE * 7, y=CELL_SIZE * 8)
+# Abre la selección de jugadores e inicia una partida nueva
 
 register_btn = tk.Button(canvas_main_menu, text="REGISTRAR", width=18,
                          font=large_font, command=open_register_window,
                          bg="gold", fg="black")
 register_btn.place(x=CELL_SIZE * 7, y=CELL_SIZE * 12)
+# Abre la ventana para registrar un nuevo jugador
 
 stats_btn = tk.Button(canvas_main_menu, text="RANKINGS", width=18,
                       font=large_font, command=open_stats_window,
                       bg="skyblue", fg="black")
 stats_btn.place(x=CELL_SIZE * 7, y=CELL_SIZE * 16)
+# Abre la ventana de estadísticas / rankings de jugadores

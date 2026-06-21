@@ -1,14 +1,14 @@
-# ====================================================================================
-# Constantes globales
-# ====================================================================================
+# ==========================================================================================
+# CONSTANTES GLOBALES
+# ==========================================================================================
 
 CELL_SIZE = 32
 
-# ====================================================================================
-# Variables globales - JUEGO
-# ====================================================================================
+# ==========================================================================================
+# VARIABLES GLOBALES - JUEGO
+# ==========================================================================================
 
-running = None
+running = None  # estado actual: "plan", "game", "win", etc.
 
 list_raiders = []
 list_walls = []
@@ -17,11 +17,11 @@ list_projectiles_raiders = []
 list_projectiles_towers = []
 central_base = None
 
-selected_element = None
+selected_element = None  # elemento actualmente seleccionado para colocar/borrar
 
-# ====================================================================================
-# Variables globales - JUGADORES
-# ====================================================================================
+# ==========================================================================================
+# VARIABLES GLOBALES - JUGADORES
+# ==========================================================================================
 
 current_attacker = None
 current_defender = None
@@ -30,36 +30,9 @@ defender_round_wins = 0
 round_number = 1
 MATCH_WIN_ROUNDS = 3
 
-# ====================================================================================
-# Variables globales - FACCIONES
-# ====================================================================================
-
-FACTIONS = {
-    "Medieval": {
-        "base": "white",
-        "wall": "saddle brown",
-        "tower": "royal blue",
-        "unit_outline": "gold"
-    },
-    "Futurista": {
-        "base": "cyan",
-        "wall": "gray35",
-        "tower": "deep sky blue",
-        "unit_outline": "cyan"
-    },
-    "Naturaleza": {
-        "base": "pale green",
-        "wall": "forest green",
-        "tower": "dark olive green",
-        "unit_outline": "lime green"
-    }
-}
-attacker_faction = "Medieval"
-defender_faction = "Futurista"
-
-# ====================================================================================
-# Variables globales - DINERO
-# ====================================================================================
+# ==========================================================================================
+# VARIABLES GLOBALES - DINERO
+# ==========================================================================================
 
 INITIAL_MONEY = 1000
 ROUND_INCOME = 100
@@ -73,3 +46,22 @@ round_damage_dealt = 0
 round_enemies_killed = 0
 previous_round_damage_dealt = 0
 previous_round_enemies_killed = 0
+
+# ==========================================================================================
+# VARIABLES GLOBALES - FACCIONES
+# ==========================================================================================
+
+FACTIONS = {
+    "Medieval": {
+
+    },
+    "Futurista": {
+
+    },
+    "Naturaleza": {
+
+    }
+}
+
+attacker_faction = "Medieval"
+defender_faction = "Futurista"
