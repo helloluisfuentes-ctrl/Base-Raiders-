@@ -39,17 +39,9 @@ def start_game():
     update_money_display()
     root.after(32, on_game_loop)
 
-# ==========================================================================================
-# SELECCIÓN DE ELEMENTOS
-# ==========================================================================================
-
-def select_element(element):
-    """Guarda el elemento seleccionado para ser colocado al hacer clic en el campo."""
-    constants.selected_element = element
-
 
 def update_money_display():
-    """Actualiza los textos de dinero en los menus."""
+    """Actualiza los textos de dinero en los menus de planeación y de partida."""
     canvas_menu_plan_defense.delete("money_info")
     canvas_menu_plan_attack.delete("money_info")
     canvas_menu_on_game.delete("money_info")
@@ -83,6 +75,13 @@ def update_money_display():
         tags="money_info"
     )
 
+# ==========================================================================================
+# SELECCIÓN DE ELEMENTOS
+# ==========================================================================================
+
+def select_element(element):
+    """Guarda el elemento seleccionado para ser colocado al hacer clic en el campo."""
+    constants.selected_element = element
 
 # ==========================================================================================
 # VALIDACIONES DE PLACEMENT
@@ -118,7 +117,6 @@ def in_defense_zone(x, y):
     """Verifica que la posición esté en la zona de defensa (mitad izquierda del campo)."""
     return 0 <= x < CELL_SIZE * 18 and 0 <= y <= CELL_SIZE * 16
 
-
 # ==========================================================================================
 # COLOCACIÓN DE ELEMENTOS EN EL MAPA
 # ==========================================================================================
@@ -126,6 +124,7 @@ def in_defense_zone(x, y):
 def place_troop(event):
     """
     Coloca un troop en la zona de ataque según el elemento seleccionado.
+    Cobra el costo correspondiente al dinero del atacante.
     Los troops no se alinean a la grilla.
     """
     if not in_attack_zone(event.x, event.y):
@@ -158,6 +157,7 @@ def place_troop(event):
 def place_tower(event):
     """
     Coloca una torre en la zona de defensa según el elemento seleccionado.
+    Cobra el costo correspondiente al dinero del defensor.
     Se alinea al grid. No se coloca si ya hay una estructura en ese punto.
     """
     if not in_defense_zone(event.x, event.y):
@@ -187,6 +187,7 @@ def place_tower(event):
 def place_wall(event):
     """
     Coloca una pared en la zona de defensa.
+    Cobra el costo correspondiente al dinero del defensor.
     Se alinea al grid. No se coloca si ya hay una estructura en ese punto.
     """
     if not in_defense_zone(event.x, event.y):
@@ -202,7 +203,7 @@ def place_wall(event):
 
 
 def delete_structure(event):
-    """Elimina la pared o torre en la posición clickeada."""
+    """Elimina la pared o torre en la posición clickeada y devuelve su costo al defensor."""
     for wall in list_walls[:]:
         if wall.x0 <= event.x <= wall.x1 and wall.y0 <= event.y <= wall.y1:
             list_walls.remove(wall)
@@ -219,14 +220,13 @@ def delete_structure(event):
 
 
 def delete_troop(event):
-    """Elimina el troop en la posición clickeada."""
+    """Elimina el troop en la posición clickeada y devuelve su costo al atacante."""
     for troop in list_raiders[:]:
         if troop.x0 <= event.x <= troop.x1 and troop.y0 <= event.y <= troop.y1:
             list_raiders.remove(troop)
             money_manager.add_attacker_money(getattr(troop, "cost", 0))
             update_money_display()
             return
-
 
 # ==========================================================================================
 # DISPATCHER PRINCIPAL DE CLICKS
@@ -272,14 +272,17 @@ def hide_main_menu():
 
 
 def reset_game_state(reset_match=True):
-    """Resetea el estado del juego para una nueva partida."""
+    """
+    Resetea el estado del juego para una nueva partida o ronda.
+    Si reset_match es True, tambien resetea el marcador completo del enfrentamiento.
+    """
     # Limpiar listas de elementos
     list_raiders.clear()
     list_walls.clear()
     list_towers.clear()
     list_projectiles_raiders.clear()
     list_projectiles_towers.clear()
-    
+
     # Resetear variables
     constants.central_base = None
     constants.selected_element = None
@@ -288,9 +291,8 @@ def reset_game_state(reset_match=True):
     canvas_menu_plan_attack.pack_forget()
     canvas_menu_on_game.pack_forget()
     canvas_field.delete("all")
-    
+
     # Resetear dinero
-    from money_management import money_manager
     money_manager.reset_round_money()
     if reset_match:
         constants.attacker_round_wins = 0
@@ -305,9 +307,9 @@ def return_to_main_menu():
     # Ocultar pantallas de victoria
     win_raiders_frame.pack_forget()
     win_defense_frame.pack_forget()
-    
+
     # Resetear estado del juego
     reset_game_state()
-    
+
     # Mostrar menú principal
     show_main_menu()

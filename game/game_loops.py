@@ -4,55 +4,12 @@ import constants
 from ui_screens import *
 from game_logic import *
 
-
-def planning_loop():
-    if constants.running != "plan":
-        return
-    
-    canvas_field.delete("all")
-    
-    draw_limit_line()
-    draw_base()
-    draw_walls()
-    draw_towers()
-    draw_raiders()
-    
-    root.after(32, planning_loop)
-    
-    
-    
-
-
-def on_game_loop():
-    
-    check_win()
-    
-    if constants.running != "game":
-        return
-    
-    canvas_field.delete("all")
-    
-    
-    
-    draw_base()
-    draw_walls()
-    draw_towers()
-    draw_raiders()
-    draw_projectiles_raiders()
-    draw_projectiles_towers()
-    
-    activate_troops()
-    activate_towers()
-    move_projectiles_raiders()
-    move_projectiles_towers()
-    update_on_game_money_display()
-    
-    
-    
-    root.after(32, on_game_loop)
-
+# ==========================================================================================
+# UI - DINERO Y MARCADOR
+# ==========================================================================================
 
 def update_on_game_money_display():
+    """Actualiza el texto de dinero, ronda y marcador en el menu durante la partida."""
     canvas_menu_on_game.delete("money_info")
     canvas_menu_on_game.create_text(
         CELL_SIZE * 6, CELL_SIZE * 2,
@@ -68,6 +25,47 @@ def update_on_game_money_display():
         fill="black",
         tags="money_info"
     )
-        
 
-        
+# ==========================================================================================
+# LOOPS PRINCIPALES
+# ==========================================================================================
+
+def planning_loop():
+    """Loop de la fase de planeación: dibuja el campo y se reprograma cada 32ms mientras running == 'plan'."""
+    if constants.running != "plan":
+        return
+
+    canvas_field.delete("all")
+
+    draw_limit_line()
+    draw_base()
+    draw_walls()
+    draw_towers()
+    draw_raiders()
+
+    root.after(32, planning_loop)
+
+
+def on_game_loop():
+    """Loop principal de la partida: verifica victoria, dibuja, ejecuta IA y movimiento, y actualiza la UI."""
+    check_win()
+
+    if constants.running != "game":
+        return
+
+    canvas_field.delete("all")
+
+    draw_base()
+    draw_walls()
+    draw_towers()
+    draw_raiders()
+    draw_projectiles_raiders()
+    draw_projectiles_towers()
+
+    activate_troops()
+    activate_towers()
+    move_projectiles_raiders()
+    move_projectiles_towers()
+    update_on_game_money_display()
+
+    root.after(32, on_game_loop)

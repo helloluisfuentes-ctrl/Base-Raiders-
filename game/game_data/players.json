@@ -1,60 +1,17 @@
 {
-    "Hero1": {
-        "username": "Hero1",
-        "password": "pass1234",
+    "Luis": {
+        "password": "1234",
         "attack_wins": 0,
         "defense_wins": 0
     },
-    "Defender1": {
-        "username": "Defender1",
-        "password": "pass5678",
+    "Elian": {
+        "password": "1234",
         "attack_wins": 0,
         "defense_wins": 0
-    },
-    "Champion": {
-        "username": "Champion",
-        "password": "pass123",
-        "attack_wins": 10,
-        "defense_wins": 15
-    },
-    "Defender": {
-        "username": "Defender",
-        "password": "pass123",
-        "attack_wins": 5,
-        "defense_wins": 20
-    },
-    "Attacker": {
-        "username": "Attacker",
-        "password": "pass123",
-        "attack_wins": 18,
-        "defense_wins": 3
-    },
-    "Legend": {
-        "username": "Legend",
-        "password": "pass123",
-        "attack_wins": 14,
-        "defense_wins": 12
     },
     "Player1": {
-        "username": "Player1",
-        "password": "pass1",
-        "attack_wins": 1,
-        "defense_wins": 0
-    },
-    "Player2": {
-        "username": "Player2",
-        "password": "pass2",
-        "attack_wins": 0,
-        "defense_wins": 1
-    },
-    "luis": {
-        "password": "1234",
-        "attack_wins": 1,
-        "defense_wins": 0
-    },
-    "elian": {
         "password": "1234",
         "attack_wins": 0,
-        "defense_wins": 2
+        "defense_wins": 0
     }
 }
